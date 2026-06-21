@@ -1,0 +1,7 @@
+serviceAccountKey.json
+venv/
+__pycache__/
+*.pyc
+dados/
+*.pkl
+.DS_Store
