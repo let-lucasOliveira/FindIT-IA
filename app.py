@@ -7,13 +7,27 @@ import joblib
 import numpy as np
 import math
 import ast
+import os
+import json
+import base64
 from rapidfuzz import fuzz
 
 app = FastAPI()
 
 # ── 1. Inicializa o Firebase Admin ──
-# Certifique-se que o arquivo serviceAccountKey.json está na mesma pasta que este script
-cred = credentials.Certificate("serviceAccountKey.json")
+# Em produção (Render): lê as credenciais da variável de ambiente FIREBASE_CREDENTIALS
+# Em desenvolvimento local: usa o arquivo serviceAccountKey.json
+_firebase_env = os.environ.get("FIREBASE_CREDENTIALS")
+if _firebase_env:
+    # Render armazena como JSON em base64 ou JSON puro
+    try:
+        _cred_dict = json.loads(base64.b64decode(_firebase_env).decode("utf-8"))
+    except Exception:
+        _cred_dict = json.loads(_firebase_env)
+    cred = credentials.Certificate(_cred_dict)
+else:
+    cred = credentials.Certificate("serviceAccountKey.json")
+
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
